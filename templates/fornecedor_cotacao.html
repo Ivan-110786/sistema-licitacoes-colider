@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><b>Portal do Fornecedor - Proposta de Preços</b></h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3 p-3 bg-light border rounded">
+            <h6 class="text-primary"><b>Processo: {{ licitacao.numero }}</b></h6>
+            <p class="mb-1"><b>Objeto:</b> {{ licitacao.objeto }}</p>
+            <span class="badge bg-secondary">Modalidade: {{ licitacao.modalidade }}</span>
+        </div>
+
+        <form method="POST" action="/fornecedor/salvar-cotacao/{{ licitacao.id }}" enctype="multipart/form-data">
+            <div class="mb-3 col-md-6">
+                <label class="form-label"><b>Nome da Empresa / Fornecedor:</b></label>
+                <input type="text" name="fornecedor" class="form-control form-control-sm" placeholder="Razão Social ou Nome do Fornecedor" required>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle" style="font-size: 0.85rem;">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th style="width: 50px;">Img Ref.</th>
+                            <th>Código</th>
+                            <th>Especificação do Item</th>
+                            <th>Qtd Total</th>
+                            <th style="width: 150px;">Preço Unitário (R$)</th>
+                            <th style="width: 200px;">Anexar Foto/Catálogo do Produto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in itens_licitacao %}
+                        <tr>
+                            <input type="hidden" name="item_id_{{ item.id }}" value="{{ item.id }}">
+                            <td class="text-center">
+                                {% if item.imagem %}
+                                    {% if item.imagem.startswith('http') %}
+                                        <img src="{{ item.imagem }}" alt="Ref" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" title="Foto de Referência da Prefeitura">
+                                    {% else %}
+                                        <img src="{{ url_for('uploaded_file', filename=item.imagem) }}" alt="Ref" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" title="Foto de Referência da Prefeitura" onerror="this.style.display='none'">
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted" style="font-size: 0.7rem;">Sem foto</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center fw-bold">{{ item.codigo }}</td>
+                            <td>{{ item.descricao }}</td>
+                            <td class="text-center fw-bold">{{ item.total_qtde }}</td>
+                            <td>
+                                <input type="number" step="0.01" name="preco_unit_{{ item.id }}" class="form-control form-control-sm text-end" placeholder="0.00">
+                            </td>
+                            <td>
+                                <input type="file" name="comprovante_{{ item.id }}" class="form-control form-control-sm" title="Anexar imagem ou folder do produto ofertado">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mt-3">🚀 Enviar Proposta Comercial e Comprovantes</button>
+        </form>
+    </div>
+</div>
+<div class="mt-3">
+    <a href="/fornecedor/cotacoes" class="btn btn-secondary btn-sm">⬅ Voltar às Cotações Abertas</a>
+</div>
+{% endblock %}

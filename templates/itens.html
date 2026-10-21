@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <!-- Formulário de Cadastro Profissional de Itens / CATMAT-CATSER -->
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><b>Cadastrar Item / Material / Serviço</b></h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Código do Item:</b></label>
+                            <input type="text" name="codigo" class="form-control form-control-sm" placeholder="Ex: 001.025" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Natureza:</b></label>
+                            <select name="tipo" class="form-select form-select-sm">
+                                <option value="Produto">Material / Produto</option>
+                                <option value="Serviço">Serviço</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Código TCE / Catálogo Oficial:</b></label>
+                        <input type="text" name="codigo_tce" class="form-control form-control-sm" placeholder="Ex: CATMAT 123456">
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Categoria do Catálogo:</b></label>
+                        <input type="text" name="categoria" class="form-control form-control-sm" value="Insumos de Impressão" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Grupo:</b></label>
+                            <input type="text" name="grupo" class="form-control form-control-sm" placeholder="Ex: Material de Expediente">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Subgrupo:</b></label>
+                            <input type="text" name="subgrupo" class="form-control form-control-sm" placeholder="Ex: Papelaria">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Unidade de Medida:</b></label>
+                            <input type="text" name="unidade_medida" class="form-control form-control-sm" value="Un" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Elemento de Despesa:</b></label>
+                            <input type="text" name="elemento_despesa" class="form-control form-control-sm" placeholder="Ex: 3.3.90.30">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Descrição Sintética (Objeto):</b></label>
+                        <textarea name="descricao" class="form-control form-control-sm" rows="2" placeholder="Nome principal do item..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><b>Detalhamento Técnico / Especificações (Termo de Referência):</b></label>
+                        <textarea name="detalhamento" class="form-control form-control-sm" rows="3" placeholder="Requisitos técnicos, marcas de referência, normas ABNT..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><b>Imagem / Foto de Referência:</b></label>
+                        <input type="file" name="imagem_arquivo" class="form-control form-control-sm mb-1">
+                        <input type="url" name="imagem_url" class="form-control form-control-sm" placeholder="Ou cole o link URL da imagem...">
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-sm w-100">✔ Registar Item no Catálogo</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Importação em Lote -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><b>Importação em Lote (Excel / CSV)</b></h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-2">
+                        <input type="file" name="arquivo_excel" class="form-control form-control-sm" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm w-100">📂 Processar Importação</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Gestão, Filtros e Exportações -->
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span><b>Catálogo de Itens Homologados</b></span>
+                <span class="badge bg-light text-dark">Total: {{ itens | length }}</span>
+            </div>
+            <div class="card-body">
+                <!-- Barra de Exportação Profissional -->
+                <div class="mb-3 p-2 bg-light border rounded d-flex justify-content-between align-items-center flex-wrap gap-1">
+                    <span class="text-secondary fw-bold" style="font-size: 0.8rem;">📥 Exportar Catálogo:</span>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="/itens/exportar/excel" class="btn btn-outline-success">Excel</a>
+                        <a href="/itens/exportar/csv" class="btn btn-outline-secondary">CSV</a>
+                        <a href="/itens/exportar/word" class="btn btn-outline-primary">Word</a>
+                        <a href="/itens/exportar/pdf" class="btn btn-outline-danger">PDF</a>
+                    </div>
+                </div>
+
+                <!-- Filtros de Pesquisa -->
+                <form method="GET" action="/itens" class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar código ou descrição..." value="{{ termo_busca or '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <select name="categoria" class="form-select form-select-sm">
+                            <option value="">Todas as Categorias</option>
+                            {% for cat in categorias_disponiveis %}
+                            <option value="{{ cat.categoria }}" {% if categoria_filtro == cat.categoria %}selected{% endif %}>{{ cat.categoria }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 text-nowrap">
+                        <button class="btn btn-outline-primary btn-sm w-100" type="submit">Filtrar</button>
+                    </div>
+                    {% if termo_busca or categoria_filtro %}
+                    <div class="col-md-12">
+                        <a href="/itens" class="btn btn-link btn-sm p-0 text-decoration-none">✖ Limpar filtros</a>
+                    </div>
+                    {% endif %}
+                </form>
+
+                <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+                    <table class="table table-striped table-bordered align-middle" style="font-size: 0.82rem;">
+                        <thead class="table-secondary sticky-top text-center">
+                            <tr>
+                                <th>Img</th>
+                                <th>Cód. / TCE</th>
+                                <th>Especificação Técnica</th>
+                                <th>Unid.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in itens %}
+                            <tr>
+                                <td class="text-center">
+                                    {% if item.imagem %}
+                                        {% if item.imagem.startswith('http') %}
+                                            <img src="{{ item.imagem }}" alt="Ref" style="width: 35px; height: 35px; object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                            <img src="{{ url_for('uploaded_file', filename=item.imagem) }}" alt="Ref" style="width: 35px; height: 35px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted" style="font-size: 0.7rem;">Sem foto</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bold text-primary">{{ item.codigo }}</span><br>
+                                    <small class="text-muted">{{ item.codigo_tce or '' }}</small>
+                                </td>
+                                <td>
+                                    <b>{{ item.descricao }}</b><br>
+                                    <span class="text-muted" style="font-size: 0.75rem;">{{ item.detalhamento[:80] if item.detalhamento else '' }}...</span><br>
+                                    <span class="badge bg-light text-dark border mt-1">Cat: {{ item.categoria }}</span>
+                                </td>
+                                <td class="text-center">{{ item.unidade_medida }}</td>
+                                <td class="text-center text-nowrap">
+                                    <a href="/itens/editar/{{ item.id }}" class="btn btn-sm btn-outline-primary py-0 px-1" style="font-size: 0.7rem;" title="Editar Item">Editar</a>
+                                    <form action="/itens/status/{{ item.id }}" method="POST" class="d-inline ms-1">
+                                        <input type="hidden" name="status" value="{% if item.status == 'Ativo' %}Desabilitado{% else %}Ativo{% endif %}">
+                                        <button type="submit" class="btn btn-sm {% if item.status == 'Ativo' %}btn-outline-warning{% else %}btn-outline-success{% endif %} py-0 px-1" style="font-size: 0.7rem;">
+                                            {% if item.status == 'Ativo' %}Desativar{% else %}Ativar{% endif %}
+                                        </button>
+                                    </form>
+                                    <a href="/itens/excluir/{{ item.id }}" class="btn btn-sm btn-outline-danger py-0 px-1 ms-1" style="font-size: 0.7rem;" onclick="return confirm('Deseja excluir?')">Excluir</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">Nenhum item encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    <a href="/" class="btn btn-secondary btn-sm">⬅ Voltar ao Painel Principal</a>
+</div>
+{% endblock %}

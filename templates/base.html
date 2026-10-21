@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Licitações - Colíder MT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .header-prefeitura { background-color: #0f2240; color: white; }
+        .sub-header { background-color: #f5cf47; color: #0f2240; font-weight: bold; }
+        .brasao-img { height: 60px; width: auto; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center header-prefeitura py-3 position-relative">
+                <img src="{{ url_for('static', filename='brasao.png') }}" alt="Brasão Colíder" class="brasao-img">
+                <div class="position-absolute top-0 end-0 p-2" style="font-size: 0.9rem;">
+                    {% if session.get('username') %}
+                    👤 <b>{{ session.get('username') }}</b> ({{ session.get('secretaria') }}) | 
+                    <a href="/logout" class="text-warning text-decoration-none">Sair</a>
+                    {% endif %}
+                </div>
+                <h3>PREFEITURA MUNICIPAL DE COLÍDER - MT</h3>
+                <p class="mb-0">Sistema Web de Gestão de Licitações e Quantitativos</p>
+            </div>
+            <div class="card-footer sub-header text-center py-2 d-flex justify-content-around">
+                <a href="/" class="text-dark text-decoration-none"><b>🏠 Painel Principal</b></a>
+                {% if session.get('perfil') == 'admin' %}
+                <a href="/secretarias" class="text-dark text-decoration-none"><b>🏛️ Secretarias</b></a>
+                <a href="/itens" class="text-dark text-decoration-none"><b>📦 Cadastro de Itens</b></a>
+                <a href="/licitacoes" class="text-dark text-decoration-none"><b>📋 Cadastro de Licitações</b></a>
+                <a href="/usuarios" class="text-dark text-decoration-none"><b>👥 Utilizadores</b></a>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

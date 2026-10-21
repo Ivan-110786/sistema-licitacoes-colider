@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <!-- Formulário de Cadastro de Utilizador -->
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white"><b>Cadastrar Novo Utilizador</b></div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-2">
+                        <label class="form-label">Nome de Utilizador (Login):</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">E-mail (para recuperação):</label>
+                        <input type="email" name="email" class="form-control" placeholder="exemplo@colider.mt.gov.br" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Senha Inicial:</label>
+                        <input type="password" name="senha" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Perfil de Acesso:</label>
+                        <select name="perfil" class="form-select">
+                            <option value="secretaria">Secretaria (Restrito ao Setor)</option>
+                            <option value="admin">Administrador (Acesso Total)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Secretaria Vinculada:</label>
+                        <select name="secretaria" class="form-select">
+                            {% for sec in secretarias %}
+                            <option value="{{ sec.nome }}">{{ sec.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Registar Utilizador</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de Utilizadores Cadastrados -->
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white"><b>Utilizadores Cadastrados</b></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle" style="font-size: 0.85rem;">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Utilizador / E-mail</th>
+                                <th>Perfil</th>
+                                <th>Secretaria</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in usuarios %}
+                            <tr>
+                                <td>
+                                    <b>{{ u.username }}</b><br>
+                                    <small class="text-muted">{{ u.email or 'Sem e-mail' }}</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge {% if u.perfil == 'admin' %}bg-danger{% else %}bg-info{% endif %}">
+                                        {{ u.perfil | capitalize }}
+                                    </span>
+                                </td>
+                                <td>{{ u.secretaria }}</td>
+                                <td class="text-center text-nowrap">
+                                    <!-- Botão para Redefinir Senha -->
+                                    <button type="button" class="btn btn-sm btn-outline-warning py-0 px-1" data-bs-toggle="modal" data-bs-target="#modalSenha{{ u.id }}" title="Redefinir Senha">Nova Senha</button>
+
+                                    {% if u.id != 1 %}
+                                    <a href="/usuarios/excluir/{{ u.id }}" class="btn btn-sm btn-outline-danger py-0 px-1 ms-1" onclick="return confirm('Tem certeza que deseja excluir este utilizador?')">Excluir</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Modal de Redefinição de Senha -->
+                            <div class="modal fade" id="modalSenha{{ u.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="/usuarios/redefinir-senha/{{ u.id }}" method="POST">
+                                            <div class="modal-header bg-warning">
+                                                <h5 class="modal-title">Redefinir Senha: {{ u.username }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <label class="form-label">Nova Senha:</label>
+                                                <input type="text" name="nova_senha" class="form-control" required placeholder="Digite a nova senha">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-warning btn-sm">Salvar Nova Senha</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    <a href="/" class="btn btn-secondary">⬅ Voltar ao Painel Principal</a>
+</div>
+{% endblock %}

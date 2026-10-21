@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white text-center">
+                <h4><b>Recuperação de Senha</b></h4>
+            </div>
+            <div class="card-body">
+                {% if mensagem %}
+                <div class="alert alert-success" role="alert">
+                    {{ mensagem }}
+                </div>
+                <a href="/login" class="btn btn-primary w-100">Voltar ao Login</a>
+                {% else %}
+                    {% if erro %}
+                    <div class="alert alert-danger" role="alert">{{ erro }}</div>
+                    {% endif %}
+                    <p class="small text-muted mb-3">Insira o seu nome de utilizador e o e-mail associado para receber o link de redefinição.</p>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Nome de Utilizador:</label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">E-mail Cadastrado:</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary w-100 mb-2">Enviar Link de Recuperação</button>
+                        <a href="/login" class="btn btn-link w-100 text-decoration-none">Cancelar</a>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

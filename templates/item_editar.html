@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><b>Editar Item do Catálogo (ID: {{ item.id }})</b></h6>
+            </div>
+            <div class="card-body">
+                
+                {% if aviso_travamento %}
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading"><b>Atenção: Item em Uso!</b></h5>
+                    <p>Este item encontra-se vinculado a um processo licitatório com o status <b>Aberta</b> onde as secretarias já estão a lançar quantitativos (DFD).</p>
+                    <hr>
+                    <p class="mb-0">Como administrador, se tem certeza da necessidade de alteração (por erro material), confirme abaixo para forçar a atualização global em todas as planilhas.</p>
+                </div>
+                <form method="POST">
+                    <input type="hidden" name="codigo" value="{{ item.codigo }}">
+                    <input type="hidden" name="tipo" value="{{ item.tipo }}">
+                    <input type="hidden" name="codigo_tce" value="{{ item.codigo_tce }}">
+                    <input type="hidden" name="categoria" value="{{ item.categoria }}">
+                    <input type="hidden" name="grupo" value="{{ item.grupo }}">
+                    <input type="hidden" name="subgrupo" value="{{ item.subgrupo }}">
+                    <input type="hidden" name="unidade_medida" value="{{ item.unidade_medida }}">
+                    <input type="hidden" name="elemento_despesa" value="{{ item.elemento_despesa }}">
+                    <input type="hidden" name="descricao" value="{{ item.descricao }}">
+                    <input type="hidden" name="detalhamento" value="{{ item.detalhamento }}">
+                    <input type="hidden" name="forcar_atualizacao" value="1">
+                    <button type="submit" class="btn btn-danger btn-sm w-100 mb-2">⚠ Confirmar e Forçar Atualização Global</button>
+                    <a href="/itens" class="btn btn-secondary btn-sm w-100">Cancelar</a>
+                </form>
+                {% else %}
+
+                {% if em_uso_aberta %}
+                <div class="alert alert-warning" role="alert">
+                    <b>Aviso:</b> Este item está a ser utilizado numa licitação aberta. A alteração refletir-se-á em todas as planilhas ativas.
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Código do Item:</b></label>
+                            <input type="text" name="codigo" class="form-control form-control-sm" value="{{ item.codigo }}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Natureza:</b></label>
+                            <select name="tipo" class="form-select form-select-sm">
+                                <option value="Produto" {% if item.tipo == 'Produto' %}selected{% endif %}>Material / Produto</option>
+                                <option value="Serviço" {% if item.tipo == 'Serviço' %}selected{% endif %}>Serviço</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Código TCE / Catálogo Oficial:</b></label>
+                        <input type="text" name="codigo_tce" class="form-control form-control-sm" value="{{ item.codigo_tce or '' }}">
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Categoria do Catálogo:</b></label>
+                        <input type="text" name="categoria" class="form-control form-control-sm" value="{{ item.categoria }}" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Grupo:</b></label>
+                            <input type="text" name="grupo" class="form-control form-control-sm" value="{{ item.grupo or '' }}">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Subgrupo:</b></label>
+                            <input type="text" name="subgrupo" class="form-control form-control-sm" value="{{ item.subgrupo or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Unidade de Medida:</b></label>
+                            <input type="text" name="unidade_medida" class="form-control form-control-sm" value="{{ item.unidade_medida }}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label"><b>Elemento de Despesa:</b></label>
+                            <input type="text" name="elemento_despesa" class="form-control form-control-sm" value="{{ item.elemento_despesa or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label"><b>Descrição Sintética (Objeto):</b></label>
+                        <textarea name="descricao" class="form-control form-control-sm" rows="2" required>{{ item.descricao }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><b>Detalhamento Técnico / Especificações (Termo de Referência):</b></label>
+                        <textarea name="detalhamento" class="form-control form-control-sm" rows="3">{{ item.detalhamento or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><b>Alterar Imagem / Foto de Referência:</b></label>
+                        {% if item.imagem %}
+                            <div class="mb-2">
+                                <small class="text-muted">Imagem atual:</small><br>
+                                {% if item.imagem.startswith('http') %}
+                                    <img src="{{ item.imagem }}" alt="Atual" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                {% else %}
+                                    <img src="{{ url_for('uploaded_file', filename=item.imagem) }}" alt="Atual" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <input type="file" name="imagem_arquivo" class="form-control form-control-sm mb-1">
+                        <input type="url" name="imagem_url" class="form-control form-control-sm" placeholder="Ou cole um novo link URL...">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-50">💾 Guardar Alterações</button>
+                        <a href="/itens" class="btn btn-secondary btn-sm w-50 text-center">✖ Cancelar</a>
+                    </div>
+                </form>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
